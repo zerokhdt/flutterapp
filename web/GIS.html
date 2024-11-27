@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>Add or remove graphics from a FeatureLayer | Sample | ArcGIS Maps SDK for JavaScript 4.30</title>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.28/"></script>
+    <script src="https://unpkg.com/url_launcher_web"></script>
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        #add {
+            margin-bottom: 5px;
+        }
+
+        #actions {
+            padding: 5px;
+        }
+
+        button:disabled {
+            opacity: 0.4;
+            -moz-opacity: 0.4; /* Firefox and Mozilla browsers */
+            -webkit-opacity: 0.4; /* Safari */
+            cursor: default;
+        }
+    </style>
+    <script>
+
+        require(["esri/Map",
+            "esri/views/MapView"
+        ],
+            (Map,
+                MapView
+            ) => {
+                const map = new Map({
+                    basemap: "streets-vector"
+                });
+                const view = new MapView({
+                    container: "viewDiv", // Reference to the view div created in step 5
+                    map: map, // Reference to the map object created before the view
+                    zoom: 10, // Sets zoom level based on level of detail (LOD)
+                    center: [106.35483, 10.35908], // longitude, latitude
+                });
+            });
+        //=======================END============================
+    </script>
+</head>
+<body>
+    <div id="viewDiv"></div>
+    </div>
+</body>
+</html>

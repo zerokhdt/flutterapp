@@ -55,7 +55,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
     try {
       var checkResponse = await http.post(
-        Uri.parse('http://localhost:3000/api/checkUsername'),
+        Uri.parse('http://192.168.1.5:3000/api/checkUsername'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'username': username}),
       );
@@ -73,7 +73,7 @@ class _RegisterPageState extends State<RegisterPage> {
       String userId = uuid.v4();
 
       var registerResponse = await http.post(
-        Uri.parse('http://localhost:3000/api/register'),
+        Uri.parse('http://192.168.1.10:3000/api/register'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': userId,

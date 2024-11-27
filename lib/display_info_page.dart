@@ -12,7 +12,7 @@ class DisplayInfoPage extends StatefulWidget {
 }
 
 class _DisplayInfoPageState extends State<DisplayInfoPage> {
-  List<dynamic> DisplayList = [];
+  List<dynamic> displayList = [];
 
   @override
   void initState() {
@@ -21,10 +21,10 @@ class _DisplayInfoPageState extends State<DisplayInfoPage> {
   }
 
   Future<void> fetchPksData() async {
-    final response = await http.get(Uri.parse('http://localhost:3000/api/getresult/${widget.userId}'));
+    final response = await http.get(Uri.parse('http://192.168.1.5:3000/api/getresult/${widget.userId}'));
     if (response.statusCode == 200) {
       setState(() {
-        DisplayList = json.decode(response.body);
+        displayList = json.decode(response.body);
       });
     } else {
       throw Exception('Tải dữ liệu phiếu khảo sát bị lỗi');
@@ -35,68 +35,84 @@ class _DisplayInfoPageState extends State<DisplayInfoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Danh sách Phiếu'),
+        title: Text('Danh sách Phiếu Kết quả'),
+        centerTitle: true,
+        backgroundColor: Colors.blue.shade700,
       ),
-      body: DisplayList.isEmpty
+      body: displayList.isEmpty
           ? Center(child: CircularProgressIndicator())
-          : GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          childAspectRatio: 3 / 4,
-        ),
-        itemCount: DisplayList.length,
-        itemBuilder: (context, index) {
-          final Display = DisplayList[index];
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ReviewAnswersPage(pksId: Display['PKSID'],Dates :Display['Dates'], userId: widget.userId,),
+          : Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2, // Hiển thị 2 cột
+            crossAxisSpacing: 10, // Khoảng cách giữa các cột
+            mainAxisSpacing: 10, // Khoảng cách giữa các hàng
+            childAspectRatio: 2 / 3, // Tỷ lệ chiều rộng/chiều cao
+          ),
+          itemCount: displayList.length,
+          itemBuilder: (context, index) {
+            final display = displayList[index];
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ReviewAnswersPage(
+                      pksId: display['PKSID'],
+                      Dates: display['Dates'],
+                      userId: widget.userId,
+                    ),
+                  ),
+                );
+              },
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.0), // Bo góc card
                 ),
-              );
-            },
-            child: Card(
-              child: Padding(
-                padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
-                child: Center(
+                elevation: 5, // Hiệu ứng bóng mờ
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Lần thứ ${index + 1}',
+                        'Lần khảo sát: ${index + 1}',
                         style: TextStyle(
                           fontSize: 14,
-                          fontStyle: FontStyle.italic,
-                          color: Colors.grey,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue.shade800,
                         ),
                       ),
-                      SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                      SizedBox(height: 10),
                       Container(
                         height: MediaQuery.of(context).size.height * 0.15,
-                        child: Center(
-                          child: Image.asset(
-                            'ks22.png',
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.0),
+                          image: DecorationImage(
+                            image: AssetImage('assets/ks22.png'),
                             fit: BoxFit.cover,
                           ),
                         ),
                       ),
-                      SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                      SizedBox(height: 10),
                       Text(
-                        Display['Name'],
+                        display['Name'],
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
+                          color: Colors.black87,
                         ),
                         textAlign: TextAlign.center,
                       ),
+                      SizedBox(height: 5),
                     ],
                   ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
