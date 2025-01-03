@@ -24,26 +24,23 @@ class _QuestionPageState extends State<QuestionPage> {
 
   Future<void> _loadQuestions() async {
     try {
-      final response = await http.get(Uri.parse('http://192.168.1.5:3000/api/questions/${widget.pksId}'));
+      final response = await http.get(Uri.parse('http://192.168.1.2:3000/api/questions/${widget.pksId}'));
       if (response.statusCode == 200) {
         setState(() {
           _questions = json.decode(response.body);
 
-          // Nhóm câu hỏi theo IsIndex
-          _groupedQuestions = [];
-          Map<String, List<dynamic>> tempGroups = {};
+          // Lấy danh sách các IsIndex duy nhất
+          List<String> uniqueIsIndexes = _questions
+              .map((question) => question['IsIndex'].toString())
+              .toSet()
+              .toList();
 
-          for (var question in _questions) {
-            String isIndex = question['IsIndex'].toString();
-            if (!tempGroups.containsKey(isIndex)) {
-              tempGroups[isIndex] = [];
-            }
-            tempGroups[isIndex]!.add(question);
-          }
+          // Nhóm câu hỏi theo IsIndex duy nhất
+          _groupedQuestions = uniqueIsIndexes.map((isIndex) {
+            return _questions.where((question) => question['IsIndex'].toString() == isIndex).toList();
+          }).toList();
 
-          // Chuyển đổi map thành list
-          _groupedQuestions = tempGroups.values.toList();
-
+          // Khởi tạo câu trả lời cho nhóm đầu tiên
           if (_answers.isEmpty) {
             _answers = _groupedQuestions[_currentGroupIndex].map((question) {
               return {
@@ -51,10 +48,11 @@ class _QuestionPageState extends State<QuestionPage> {
                 'PurportAS': '',
                 'QuestionID': question['QuestionID'].toString(),
                 'UserID': widget.userId,
-                'Dates': DateTime.now().toIso8601String().toString(),
+                'Dates': DateTime.now().toIso8601String().split('.')[0].toString(),
               };
             }).toList();
           }
+
           _controllers = List.generate(_groupedQuestions[_currentGroupIndex].length, (index) {
             return [TextEditingController()];
           });
@@ -70,7 +68,7 @@ class _QuestionPageState extends State<QuestionPage> {
   Future<int> _getResultCount() async {
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.1.5:3000/api/checkresult/${widget.userId}'),
+        Uri.parse('http://192.168.1.2:3000/api/checkresult/${widget.userId}'),
       );
 
       if (response.statusCode == 200) {
@@ -103,7 +101,7 @@ class _QuestionPageState extends State<QuestionPage> {
   Future<void> _saveAllAnswers() async {
     // Tạo danh sách để lưu tất cả câu trả lời từ tất cả các nhóm
     List<Map<String, String>> allAnswers = [];
-    String currentDate = DateTime.now().toIso8601String();
+    String currentDate = DateTime.now().toIso8601String().split('.')[0];
 
 
     // Duyệt qua tất cả các nhóm và thêm câu trả lời của mỗi nhóm vào danh sách `allAnswers`
@@ -138,7 +136,7 @@ class _QuestionPageState extends State<QuestionPage> {
     try {
       for (var answer in allAnswers) {
         final postResponse = await http.post(
-          Uri.parse('http://192.168.1.5:3000/api/answers'),
+          Uri.parse('http://192.168.1.2:3000/api/answers'),
           headers: {'Content-Type': 'application/json'},
           body: json.encode(answer), // Gửi tất cả câu trả lời cùng một lúc
         );
@@ -210,7 +208,7 @@ class _QuestionPageState extends State<QuestionPage> {
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
-                  '${_questions[_currentGroupIndex]['IsIndex']}',
+                  '${_groupedQuestions[_currentGroupIndex][0]['IsIndex']}',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
               ),

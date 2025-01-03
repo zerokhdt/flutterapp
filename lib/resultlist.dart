@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:test_application/Result.dart';
 import 'dart:convert';
-import 'collect_info_page.dart';
+import 'ReviewAnswersPage.dart';
 
-class PksListPage extends StatefulWidget {
+class ResultListPage extends StatefulWidget {
   final String userId;
 
-  PksListPage({required this.userId});
+  ResultListPage({required this.userId});
+
   @override
-  _PksListPageState createState() => _PksListPageState();
+  _ResultListPageState createState() => _ResultListPageState();
 }
 
-class _PksListPageState extends State<PksListPage> {
-  List<dynamic> pksList = [];
+class _ResultListPageState extends State<ResultListPage> {
+  List<dynamic> resultList = [];
 
   @override
   void initState() {
@@ -21,10 +23,10 @@ class _PksListPageState extends State<PksListPage> {
   }
 
   Future<void> fetchPksData() async {
-    final response = await http.get(Uri.parse('http://192.168.1.2:3000/api/getpks'));
+    final response = await http.get(Uri.parse('http://192.168.1.2:3000/api/getresultlist/${widget.userId}'));
     if (response.statusCode == 200) {
       setState(() {
-        pksList = json.decode(response.body);
+        resultList = json.decode(response.body);
       });
     } else {
       throw Exception('Tải dữ liệu phiếu khảo sát bị lỗi');
@@ -35,46 +37,59 @@ class _PksListPageState extends State<PksListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Danh sách Phiếu'),
+        title: Text('Danh sách Phiếu Kết quả'),
         centerTitle: true,
         backgroundColor: Colors.blue.shade700,
       ),
-      body: pksList.isEmpty
+      body: resultList.isEmpty
           ? Center(child: CircularProgressIndicator())
           : Padding(
         padding: const EdgeInsets.all(10.0),
         child: GridView.builder(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2, // Số cột
+            crossAxisCount: 2, // Hiển thị 2 cột
             crossAxisSpacing: 10, // Khoảng cách giữa các cột
             mainAxisSpacing: 10, // Khoảng cách giữa các hàng
             childAspectRatio: 2 / 3, // Tỷ lệ chiều rộng/chiều cao
           ),
-          itemCount: pksList.length,
+          itemCount: resultList.length,
           itemBuilder: (context, index) {
-            final pks = pksList[index];
+            final result = resultList[index];
             return GestureDetector(
-              onTap: () {
-                Navigator.push(
+              onTap: () async {
+                final response = await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => QuestionPage(
-                      pksId: pks['PKSID'],
+                    builder: (context) => ResultsPage(
+                      timereply: result['Timereply'],
                       userId: widget.userId,
                     ),
                   ),
                 );
+                // Nếu kết quả trả về là true, reload dữ liệu
+                if (response == true) {
+                  fetchPksData();
+                }
               },
               child: Card(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16.0), // Bo góc
+                  borderRadius: BorderRadius.circular(16.0), // Bo góc card
                 ),
-                elevation: 5, // Đổ bóng
+                elevation: 5, // Hiệu ứng bóng mờ
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      Text(
+                        'Lần khảo sát: ${result['Timereply']}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue.shade800,
+                        ),
+                      ),
+                      SizedBox(height: 10),
                       Container(
                         height: MediaQuery.of(context).size.height * 0.15,
                         decoration: BoxDecoration(
@@ -87,14 +102,15 @@ class _PksListPageState extends State<PksListPage> {
                       ),
                       SizedBox(height: 10),
                       Text(
-                        pks['Name'],
+                        result['NameKS'], // Updated to use NameKS
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.blue.shade800,
+                          color: Colors.black87,
                         ),
                         textAlign: TextAlign.center,
                       ),
+                      SizedBox(height: 5),
                     ],
                   ),
                 ),

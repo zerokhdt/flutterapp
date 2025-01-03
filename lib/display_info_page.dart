@@ -21,7 +21,7 @@ class _DisplayInfoPageState extends State<DisplayInfoPage> {
   }
 
   Future<void> fetchPksData() async {
-    final response = await http.get(Uri.parse('http://192.168.1.5:3000/api/getresult/${widget.userId}'));
+    final response = await http.get(Uri.parse('http://192.168.1.2:3000/api/getresult/${widget.userId}'));
     if (response.statusCode == 200) {
       setState(() {
         displayList = json.decode(response.body);
@@ -54,8 +54,8 @@ class _DisplayInfoPageState extends State<DisplayInfoPage> {
           itemBuilder: (context, index) {
             final display = displayList[index];
             return GestureDetector(
-              onTap: () {
-                Navigator.push(
+              onTap: () async {
+                final result = await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => ReviewAnswersPage(
@@ -65,6 +65,10 @@ class _DisplayInfoPageState extends State<DisplayInfoPage> {
                     ),
                   ),
                 );
+                // Nếu kết quả trả về là true, reload dữ liệu
+                if (result == true) {
+                  fetchPksData();
+                }
               },
               child: Card(
                 shape: RoundedRectangleBorder(

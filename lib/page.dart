@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:test_application/Situation.dart';
+import 'package:test_application/Predict.dart';
 import 'display_info_page.dart';
 import 'pks.dart';
 import 'MapPage.dart'; // Import HelpScreen
@@ -51,10 +51,10 @@ class _PageScreenState extends State<PageScreen> {
       ),
     ),
     ButtonData(
-      label: 'Tình trạng đàn heo',
+      label: 'Dự đoán bệnh',
       iconPath: 'assets/hientrang.png',
       action: (context, userId) => Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => SituationPage(userId: userId)),
+        MaterialPageRoute(builder: (context) => PredictPage(userId: userId)),
       ),
     ),
   ];

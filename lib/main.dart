@@ -33,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _login() async {
     final response = await http.post(
-      Uri.parse('http://192.168.1.5:3000/api/login'),
+      Uri.parse('http://192.168.1.2:3000/api/login'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
         'username': _usernameController.text,

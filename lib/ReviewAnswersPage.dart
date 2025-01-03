@@ -20,7 +20,7 @@ class _ReviewAnswersPageState extends State<ReviewAnswersPage> {
   Future<void> _loadQuestionsAndAnswers() async {
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.1.5:3000/api/reviewanswers/${widget.userId}/${widget.pksId}/${widget.Dates}'),
+        Uri.parse('http://192.168.1.2:3000/api/reviewanswers/${widget.userId}/${widget.pksId}/${widget.Dates}'),
       );
       if (response.statusCode == 200) {
         setState(() {
@@ -40,13 +40,13 @@ class _ReviewAnswersPageState extends State<ReviewAnswersPage> {
   Future<void> deleteAnswers() async {
     try {
       final response = await http.delete(
-        Uri.parse('http://192.168.1.5:3000/api/deleteanswers/${widget.userId}/${widget.Dates}'),
+        Uri.parse('http://192.168.1.2:3000/api/deleteanswers/${widget.userId}/${widget.Dates}'),
       );
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Đã xóa câu trả lời thành công')),
         );
-        Navigator.pop(context);
+        Navigator.pop(context,true);
       } else {
         throw Exception('Xóa câu trả lời bị lỗi');
       }
@@ -60,7 +60,7 @@ class _ReviewAnswersPageState extends State<ReviewAnswersPage> {
   Future<void> setPriority() async {
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.1.5:3000/api/setpriority/${widget.userId}/${widget.pksId}/${widget.Dates}'),
+        Uri.parse('http://192.168.1.2:3000/api/setpriority/${widget.userId}/${widget.pksId}/${widget.Dates}'),
       );
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
